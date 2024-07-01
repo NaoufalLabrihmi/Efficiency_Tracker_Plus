@@ -1,4 +1,5 @@
-# Productivity Manager
+# Efficiency Tracker Plus
+Efficiency Navigator Plus is a robust tool designed to meticulously monitor and optimize employee utilization across departmental projects. This innovative system not only tracks but also analyzes workforce efficiency, empowering administrators to make informed decisions for resource allocation and workload management. Built with advanced analytics capabilities, Efficiency Navigator Plus provides real-time insights into project progress, helping organizations achieve peak operational efficiency while ensuring optimal resource utilization.
 
 ## Getting Started
 
