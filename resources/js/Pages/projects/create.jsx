@@ -1,30 +1,43 @@
 import React from 'react';
-import { useForm } from '@inertiajs/inertia-react';
-import { Button, Typography, TextField } from '@mui/material';
+import { Head, useForm } from '@inertiajs/inertia-react';
+import {
+  Autocomplete,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import TextFieldWithIcon from '@/Components/Inputs/TextFieldWithIcon';
 import UserIcon from '@/Components/Icons/UserIcon';
-import MailIcon from '@/Components/Icons/MailIcon';
+import ProjectsIcon from '@/Components/Icons/ProjectsIcon';
 import InputWithIcon from '@/Components/Inputs/InputWithIcon';
-import { VpnKeyOutlined } from '@mui/icons-material';
-import UserTypeIcon from '@/Components/Icons/UserTypeIcon';
-import SelectIndex from '@/Components/Inputs/Select/SelectIndex';
+import RegionIcon from '@/Components/Icons/RegionIcon';
+import UtilizationInput from '@/Components/Inputs/UtilizationInput';
+import UtilizationIcon from '@/Components/Icons/UtilizationIcon';
 
 export default function Create(props) {
-  const resource = 'user';
-  const { data, setData, errors, processing, post } = useForm({
+  const resource = 'project';
+  const { data, setData, errors, post } = useForm({
     name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-    userType: 2,
+    leader: '',
+    region: '',
+    leader_utilization: 0,
   });
 
   function handleSubmit(e) {
     e.preventDefault();
-    console.log(data);
-    post(route(`users.store`), {
-      onSuccess: (params) => alert('Success'),
+    if (data.leader === '' || data.region === '') {
+      alert('Please fill in all required fields');
+      return;
+    }
+    post(route(`${resource}s.store`), {
+      onSuccess: () => {
+        alert('success');
+      },
     });
   }
 
@@ -36,99 +49,104 @@ export default function Create(props) {
     }));
   };
 
-  const handleSelectChange = (name, value) => {
+  const handleRegionChange = (event, value) => {
     setData((currentData) => ({
       ...currentData,
-      [name]: value,
+      region: value ? value.name : '',
     }));
   };
 
-  const user_type = [
-    { id: 3, name: 'admin' },
-    { id: 2, name: 'leader' },
+  const regions = [
+    { id: 1, name: 'Egypt' },
+    { id: 2, name: 'SA' },
+    { id: 3, name: 'UAE' },
+    { id: 4, name: 'Morocco' }, // Added Morocco
   ];
 
   return (
     <AuthenticatedLayout
       auth={props.auth}
       errors={props.errors}
-      title={'Users'}
+      title={'Projects'}
       backHref={`/${resource}s`}
     >
-      <div id="white container" className="rounded-lg px-48 py-16 bg-white">
-        <div id="form container" className="px-48 pt-16">
-          <Typography sx={{ mb: 2 }} variant="h5">
-            Add a user
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <TextFieldWithIcon
-              label={'Name'}
-              icon={<UserIcon svgClassName={'w-6 h-6'} />}
-              onChange={updateFormData}
-              error={errors.name}
-              name={'name'}
-            />
-            <TextFieldWithIcon
-              label={'Email'}
-              icon={<MailIcon svgClassName={'w-6 h-6'} />}
-              onChange={updateFormData}
-              error={errors.email}
-              name={'email'}
-            />
-
-            <InputWithIcon
-              input={
-                <TextField
-                  name={'password'}
-                  type="password"
-                  sx={{ minWidth: 1 }}
+      <Head>
+        <title>Create a project</title>
+      </Head>
+      <div id="white container" className="rounded-lg px-32 py-12 bg-white">
+        <Typography sx={{ mb: 2 }} variant="h5">
+          Create a project
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextFieldWithIcon
+            label={'Name'}
+            name={'name'}
+            icon={<ProjectsIcon svgClassName={'w-6 h-6'} />}
+            onChange={updateFormData}
+            error={errors.name}
+          />
+          <InputWithIcon
+            input={
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Leader</InputLabel>
+                <Select
                   className="bg-content"
-                  onChange={updateFormData}
-                  required
-                  label="user's password"
-                  variant="outlined"
-                />
-              }
-              error={errors.password}
-              icon={<VpnKeyOutlined className={'w-6 h-6'} />}
-            />
-            <InputWithIcon
-              input={
-                <TextField
-                  name={'password_confirmation'}
-                  type="password"
                   sx={{ minWidth: 1 }}
-                  className="bg-content"
-                  onChange={updateFormData}
+                  name={'leader'}
+                  label={'leader'}
+                  labelId="demo-simple-select-label"
                   required
-                  label="confirm password"
-                  variant="outlined"
-                />
-              }
-              error={errors.password_confirmation}
-              icon={<VpnKeyOutlined className={'w-6 h-6'} />}
-            />
-            <InputWithIcon
-              input={
-                <SelectIndex
-                  name={'userType'}
-                  label={'user type'}
-                  onChange={(e, value) => handleSelectChange('userType', value)}
-                  data={user_type}
-                  value={data.userType}
-                />
-              }
-              error={errors.userType}
-              icon={<UserTypeIcon svgClassName={'w-6 h-6'} />}
-            />
-            <Button
-              type={'submit'}
-              style={{ backgroundColor: 'rgba(75, 0, 130, 0.3)', color: 'black' }}
-            >
-              Add user
-            </Button>
-          </form>
-        </div>
+                  value={data.leader}
+                  onChange={updateFormData}
+                >
+                  {props.leaders.map((i) => (
+                    <MenuItem key={i.id} value={i.id}>
+                      {i.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            }
+            icon={<UserIcon svgClassName={'w-6 h-6'} />}
+            error={errors.leader}
+          />
+          <InputWithIcon
+            input={
+              <UtilizationInput
+                onChange={updateFormData}
+                name={'leader_utilization'}
+              />
+            }
+            icon={<UtilizationIcon svgClassName={'w-6 h-6'} />}
+            error={errors.leader_utilization}
+          />
+          <InputWithIcon
+            input={
+              <Autocomplete
+                sx={{ minWidth: 1 }}
+                className="bg-content"
+                disablePortal
+                id="combo-box-regions"
+                options={regions}
+                getOptionLabel={(i) => i.name}
+                name={'region'}
+                required
+                onChange={handleRegionChange}
+                renderInput={(params) => (
+                  <TextField {...params} label="Region" />
+                )}
+              />
+            }
+            icon={<RegionIcon svgClassName={'w-6 h-6'} />}
+            error={errors.region}
+          />
+          <Button
+            type="submit"
+            style={{ backgroundColor: 'rgba(75, 0, 130, 0.3)', color: 'black' }}
+          >
+            Add project
+          </Button>
+        </form>
       </div>
     </AuthenticatedLayout>
   );
